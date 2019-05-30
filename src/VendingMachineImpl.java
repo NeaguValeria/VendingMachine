@@ -1,3 +1,4 @@
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
@@ -10,10 +11,12 @@ public class VendingMachineImpl implements VendingMachine {
     private long currentBalance;
 
     public VendingMachineImpl() {
-        initialize();
+        this.initialize();
     }
 
     void initialize() {
+        cashInventory = new Inventory<>();
+        itemInventory = new Inventory<>();
         for (Coin c : Coin.values()) {
             cashInventory.put(c, 5);
         }
@@ -38,7 +41,10 @@ public class VendingMachineImpl implements VendingMachine {
         cashInventory.add(coin);
     }
 
-    public void updateCashInventory(List change) {
+    public void updateCashInventory(List<Coin> change) {
+        for(Coin c : change){
+           cashInventory.decrease(c);
+        }
 
     }
 
@@ -50,11 +56,17 @@ public class VendingMachineImpl implements VendingMachine {
         }
     }
 
+    /**
+     * Metoda aceasta
+     * @param amount suma introdusa de client
+     * @return
+     * @throws NotSufficientChangeException
+     */
     public List<Coin> getChange(long amount) throws NotSufficientChangeException {
-        List<Coin> changes = Collections.EMPTY_LIST;
+        List<Coin> changes = new ArrayList<>();
         long balance = amount;
         while (balance > 0) {
-            if (balance >= Coin.FIFTY.getValue() && cashInventory.hasItem(Coin.FIVE)) {
+            if (balance >= Coin.FIFTY.getValue() && cashInventory.hasItem(Coin.FIFTY)) {
                 changes.add(Coin.FIFTY);
                 balance = balance - Coin.FIFTY.getValue();
                 continue;
@@ -66,14 +78,16 @@ public class VendingMachineImpl implements VendingMachine {
                 changes.add(Coin.TEN);
                 balance = balance - Coin.TEN.getValue();
                 continue;
-            } else if (balance >= Coin.FIFTY.getValue() && cashInventory.hasItem(Coin.FIFTY)) {
-                changes.add(Coin.FIFTY);
-                balance = balance - Coin.FIFTY.getValue();
+            } else if (balance >= Coin.FIVE.getValue() && cashInventory.hasItem(Coin.FIVE)) {
+                changes.add(Coin.FIVE);
+                balance = balance - Coin.FIVE.getValue();
                 continue;
-            } else {
+            }
+            else {
                 throw new NotSufficientChangeException("NotSufficientChange");
             }
         }
+        System.out.println("returned" + changes.toString());
         return changes;
     }
 
@@ -82,7 +96,7 @@ public class VendingMachineImpl implements VendingMachine {
         try {
             getChange(amount);
         } catch (NotSufficientChangeException nsce) {
-            return hasChange = false;
+            return false;
         }
         return hasChange;
     }
@@ -111,7 +125,7 @@ public class VendingMachineImpl implements VendingMachine {
         return change;
     }
 
-    public PurchaseAndCoins<Item, List<Coin>> colletItemAndGetChange() throws NotSufficientChangeException {
+    public PurchaseAndCoins<Item, List<Coin>> collectItemAndChange() throws NotSufficientChangeException {
         Item item = collectItem();
         totalSales = totalSales + currentItem.getPrice();
         List<Coin> change = collectChange();
@@ -138,8 +152,8 @@ public class VendingMachineImpl implements VendingMachine {
 
     public void printStats() {
         System.out.println("total sales: " + totalSales);
-        System.out.println("current item inventory: " + itemInventory);
-        System.out.println("current cash inventory: " + cashInventory);
+        System.out.println("current item inventory: " + itemInventory.toString());
+        System.out.println("current cash inventory: " + cashInventory.toString());
     }
 
     public long getTotalSales() {
