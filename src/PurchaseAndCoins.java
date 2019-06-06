@@ -8,9 +8,6 @@ public class PurchaseAndCoins<T1,T2> {
         this.coins = coins;
     }
 
-    public PurchaseAndCoins(T1 item) {
-    }
-
     public T1 getItem() {
         return item;
     }

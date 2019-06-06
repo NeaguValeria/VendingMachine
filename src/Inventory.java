@@ -21,7 +21,7 @@ public class Inventory <T>{
     }
 
     public boolean hasItem(T item){
-        return inventory.containsKey(item);
+        return inventory.containsKey(item) && inventory.get(item) > 0;
         
     }
 
@@ -43,13 +43,13 @@ public class Inventory <T>{
 
     @Override
     public String toString() {
-        String response = null;
+        StringBuilder response = new StringBuilder();
         Integer total = 0;
         List<String> lista = new ArrayList<>();
         for (Map.Entry<T, Integer> map: inventory.entrySet()){
             total = total + map.getValue();
-            response = response + " " + map.getKey().toString() + " " + map.getValue() + " ";
+            response.append(" ").append(map.getKey().toString()).append(" ").append(map.getValue()).append(" ");
         }
-        return response + "total = " + total;
+        return response.append( "total = ").append(total).toString();
     }
 }
